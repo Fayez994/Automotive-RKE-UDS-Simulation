@@ -56,7 +56,7 @@ This repository demonstrates a **2-ECU architecture**:
 ```
 assets/
   architecture.png
-  evidence/                # put photos, videos, logs, CAN traces here
+  evidence/                
 docs/
   REQUIREMENTS.md
   TEST_PLAN.md
@@ -107,7 +107,7 @@ firmware/
 Put artifacts in **assets/evidence/**:
 - `video_demo.mp4` 
 - `serial_gateway.log`, `serial_door.log`
-- Optional: CAN trace screenshot (logic analyzer / CAN tool)
+- CAN trace screenshot (logic analyzer / CAN tool)
 
 See **docs/TEST_CASES.md** for exact evidence mapping per test case.
 
