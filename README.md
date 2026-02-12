@@ -60,7 +60,7 @@ This project simulates a simplified vehicle **BCM/DCU architecture**:
 [![RKE/UDS Demo Video](https://img.youtube.com/vi/<VIDEO_ID>/0.jpg)](https://youtu.be/mN5SC-dQ7lI)
 
 ### 2) HIL Bench Photo
-![HIL Bench Setup](assets/evidence/hil.jpeg)
+![HIL Bench Setup](assets/evidence/HIL.jpeg)
 
 ### 3) CAN Trace
 - Full log: [`assets/evidence/canlog.md`](assets/evidence/canlog.md)
