@@ -146,7 +146,7 @@ void loop() {
         state = IDLE;
       }
       break;
-  } // <--- SWITCH ENDS HERE
+  } 
 
   // 3. HEARTBEAT LOGIC 
   if (millis() - lastHeartbeatMs >= HEARTBEAT_INTERVAL_MS) {
