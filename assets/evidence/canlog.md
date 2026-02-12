@@ -49,6 +49,7 @@
 # Looking for: UDS (0x7E0/0x7E8)
 | Timestamp | Direction | ID_Hex | DLC | Data |Interpretation|
 |---|---|---|---|---|---|
-|-1770836691|	REQ| (Gw->Door)|	0x7E0	|8|	02 31 01 00 00 00 00 00|	Unlock Command|
-|-1770836691	|RES| (Door->Gw)|	0x7E8	|8	|02 71 01 00 00 00 00 00	|Positive Ack|
+|-1770836691|	REQ (Gw->Door)|	0x7E0	|8|	02 31 01 00 00 00 00 00|	Unlock Command|
+|-1770836691	|RES (Door->Gw)|	0x7E8	|8	|02 71 01 00 00 00 00 00	|Positive Ack|
+
 
