@@ -20,6 +20,7 @@ This project simulates a simplified vehicle **BCM/DCU architecture**:
 
 ![RKE & PEPS Architecture](assets/architecture.png)
 
+
 **Topology:**  
 `Mobile (BLE) → Node A (Gateway BCM) → CAN Bus → Node B (Door ECU) → Servo Actuator`
 
