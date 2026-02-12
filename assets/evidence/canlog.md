@@ -1,5 +1,5 @@
 # python can log
-
+ Heartbeats (0x505)
 | Timestamp | Type | Message | Door Status | Angle (°) | Notes |
 |---:|---|---|---|---:|---|
 | -1770836694.862 | CYCLIC | Door Status: IDLE \| Angle: 20° | IDLE | 20 |  |
@@ -46,8 +46,9 @@
 
 ---
 ---
-# Looking for: UDS (0x7E0/0x7E8) AND Heartbeats (0x505)
+# Looking for: UDS (0x7E0/0x7E8)
 | Timestamp | Direction | ID_Hex | DLC | Data |Interpretation|
 |---|---|---|---|---|---|
 |-1770836691|	REQ| (Gw->Door)|	0x7E0	|8|	02 31 01 00 00 00 00 00|	Unlock Command|
 |-1770836691	|RES| (Door->Gw)|	0x7E8	|8	|02 71 01 00 00 00 00 00	|Positive Ack|
+
