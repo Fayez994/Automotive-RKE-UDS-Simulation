@@ -1,119 +1,72 @@
 # Automotive-RKE-UDS-Simulation
 
-**Automotive Remote Keyless Entry (RKE) + Passive Entry (PEPS) demo using BLE (Phone-as-a-Key) → UDS over CAN → Door Actuator (HIL bench).**
+**Remote Keyless Entry (RKE) / Phone-as-a-Key (PaaK) bench demo** using **BLE → UDS (ISO 14229) over CAN** between two ESP32 ECUs (Gateway BCM + Door ECU) with a HIL-style actuator.
 
-This repository demonstrates a **2-ECU architecture**:
-- **Node A (Gateway / BCM)**: BLE GATT server receives unlock intent (mobile app or capacitive touch), then sends a **UDS RoutineControl (0x31)** request over **High-Speed CAN**.
-- **Node B (Door ECU / DCU)**: UDS server listens for routine ID **0x01 (Unlock)** and actuates a **servo latch**, then returns a **positive response (0x71)**.
-
-> Scope: bench / hardware-in-the-loop demonstration of integration + validation workflows (logs, evidence, requirements, test cases, traceability).
+> **description:**  
+> ESP32 BLE Phone-as-a-Key demo translating BLE unlock to UDS RoutineControl (0x31) over 500 kbps CAN (MCP2515) to a Door ECU that actuates a servo latch and returns a 0x71 positive response.
 
 ---
 
-## Architecture
+## Overview
+
+This project simulates a simplified vehicle **BCM/DCU architecture**:
+
+- **Node A (Gateway / BCM)**: BLE server + touch “handle” input, sends UDS request on CAN.
+- **Node B (Door ECU / DCU)**: receives UDS request, responds with positive ack, actuates a servo “door latch”.
+
+---
+
+## System Architecture
 
 ![RKE & PEPS Architecture](assets/architecture.png)
 
-**Topology:** Mobile Device ⇄(BLE GATT)⇄ Node A (Gateway ECU) ⇄(CAN HS 500 kbps)⇄ Node B (Door ECU) ⇄(PWM)⇄ Servo Latch
+**Topology:**  
+`Mobile (BLE) → Node A (Gateway BCM) → CAN Bus → Node B (Door ECU) → Servo Actuator`
 
 ---
 
-## Key Protocol Details
+## Key Features
 
-### BLE (Phone-as-a-Key)
-- Node A advertises a BLE service and characteristic (GATT Server).
-- Mobile client writes a value (`'1'`) to trigger unlock intent.
+- BLE “Unlock” command (GATT write)
+- Capacitive “handle touch” input using ESP32 `touchRead()`
+- UDS RoutineControl request/response on CAN IDs:
+  - Request: **0x7E0**
+  - Response: **0x7E8**
+- Evidence package: HIL photo + CAN trace + demo video
+- QA-style documentation: requirements, test plan, test cases, traceability
 
-### UDS over CAN (DoCAN / ISO-TP single-frame)
-**Request (Gateway → Door)**
-- CAN ID: `0x7E0` (Functional Request)
+---
+
+## Communication Protocol (UDS over CAN, Single-Frame)
+
+**UDS Request (Gateway → Door)**
+- CAN ID: `0x7E0`
 - Data: `02 31 01 00 00 00 00 00`
-  - `02` = PCI length (2 bytes payload)
-  - `31` = UDS Service: RoutineControl
-  - `01` = Routine ID: Unlock (project-defined)
+  - `02` = ISO-TP Single Frame length (2 bytes payload)
+  - `31` = RoutineControl
+  - `01` = Routine ID (Unlock)
 
-**Response (Door → Gateway)**
-- CAN ID: `0x7E8` (Positive Response)
+**UDS Positive Response (Door → Gateway)**
+- CAN ID: `0x7E8`
 - Data: `02 71 01 00 00 00 00 00`
-  - `71` = Positive Response SID (0x31 + 0x40)
+  - `71` = Positive response for `0x31` (service + 0x40)
   - `01` = Routine ID echo
 
 ---
 
-## Hardware
+## Evidence
 
-- 2× ESP32 DevKit
-- 2× MCP2515 + TJA1050 CAN modules (8 MHz oscillator, 500 kbps)
-- 2× 120Ω termination (end-to-end)
-- Servo motor (door latch simulation)
-- OLED SSD1306 (I2C) on Node A
-- Capacitive touch wire on Node A (ESP32 touch pin)
+### 1) Demo Video (YouTube)
+Replace `<VIDEO_ID>` with your YouTube ID:
+[![RKE/UDS Demo Video](https://img.youtube.com/vi/<VIDEO_ID>/0.jpg)](https://www.youtube.com/watch?v=<VIDEO_ID>)
 
----
+### 2) HIL Bench Photo
+![HIL Bench Setup](assets/evidence/hil.jpeg)
 
-## Repository Layout
+### 3) CAN Trace
+- Full log: [`assets/evidence/canlog.md`](assets/evidence/canlog.md)
 
-```
-assets/
-  architecture.png
-  evidence/                
-docs/
-  REQUIREMENTS.md
-  TEST_PLAN.md
-  TEST_CASES.md
-  TRACEABILITY.md
-  ISSUE_TEMPLATE.md
-  TEST_REPORT_TEMPLATE.md
-firmware/
-  nodeA_gateway/nodeA_gateway.ino
-  nodeB_door/nodeB_door.ino
-```
-
----
-
-## Quick Start (Bench)
-
-1. Wire CAN:
-   - MCP2515/TJA1050 to each ESP32 (SPI + INT as needed)
-   - CANH↔CANH, CANL↔CANL
-   - Add 120Ω termination at each end
-2. Flash firmware:
-   - Node A: `firmware/nodeA_gateway/nodeA_gateway.ino`
-   - Node B: `firmware/nodeB_door/nodeB_door.ino`
-3. Open Serial Monitor (115200) for both nodes.
-4. Connect phone to BLE device: `Fayez_Car_Pro`.
-5. Trigger unlock:
-   - Option A: write `'1'` to characteristic
-   - Option B: touch capacitive wire (PEPS intent)
-6. Observe evidence:
-   - Node A OLED: `UNLOCKING...` → `UNLOCKED!`
-   - Node B servo: moves to 90° then returns to 0°
-   - Serial logs show request + positive response
-
----
-
-## Systems Engineering Artifacts (Requirements + Verification)
-
-- Requirements: **docs/REQUIREMENTS.md**
-- Test Plan: **docs/TEST_PLAN.md**
-- Test Cases: **docs/TEST_CASES.md**
-- Traceability Matrix (Req ↔ Test): **docs/TRACEABILITY.md**
-- Issue Report template: **docs/ISSUE_TEMPLATE.md**
-
----
-
-## Evidence (what to upload)
-
-Put artifacts in **assets/evidence/**:
-- `video_demo.mp4` 
-- `serial_gateway.log`, `serial_door.log`
-- CAN trace screenshot (logic analyzer / CAN tool)
-
-See **docs/TEST_CASES.md** for exact evidence mapping per test case.
-
----
-
-## Notes / Limitations
-
-- This demo uses **single-frame ISO-TP** formatting (8-byte CAN frame with PCI length).
-- Security is intentionally simplified for demonstration (production systems require cryptography, challenge-response, and OEM-specific security concepts).
+Capture (request + response):
+```text
+0.792830, RX, 0x7E0, 8, 02 31 01 00 00 00 00 00
+0.793831, RX, 0x7E8, 8, 02 71 01 00 00 00 00 00
